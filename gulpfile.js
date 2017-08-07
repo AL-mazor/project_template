@@ -13,8 +13,10 @@ var gulp = require('gulp'),
 	imagemin = require('gulp-imagemin'),
 	uglify = require('gulp-uglify'),
 	changed = require('gulp-changed'), // check if files in dist directory are changed
+	plumber = require('gulp-plumber'), // catch error on the fly without gulp stop
 	// rimraf = require('rimraf'),
 	// buffer = require('vinyl-buffer'),
+	mainBowerFiles = require('gulp-main-bower-files'),
 	csso = require('gulp-csso');
 
 // pathes to files
@@ -25,7 +27,8 @@ var paths = {
         js: 'dist/js/',
         img: 'dist/img/',
 		sprites: 'dist/img/sprites',
-        fonts: 'dist/fonts/'
+        fonts: 'dist/fonts/',
+		libs: 'dist/libs/'
     },
     src: {
 		pug: ['src/*.pug', 'src/**/*.pug'],
@@ -33,7 +36,7 @@ var paths = {
 		scripts: ['src/js/*.js'],
 		images: ['src/img/*.png', 'src/img/*.jpg'],
 		sprites: ['src/img/sprites/*.*'],
-		fonts: ['src/fonts/**/*']
+		fonts: ['src/fonts/**/*'],
     }
 };
 
@@ -49,22 +52,25 @@ gulp.task('html', function buildHTML() {
 
 // sass to css
 gulp.task('sass', function () {
-	return gulp.src(paths.src.sass)
-		.pipe(sourcemaps.init())
-			.pipe(changed(paths.build.css))
-			.pipe(sass())
-			.pipe(csso())
-			.pipe(autoprefixer({
-				browsers: ['last 2 versions']
-			}))
-		.pipe(sourcemaps.write('css/'))
-		.pipe(gulp.dest(paths.build.css))
-		.pipe(sync.stream());
+    return gulp.src(paths.src.sass)
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(changed(paths.build.css))
+        .pipe(sass())
+        .pipe(csso())
+        .pipe(autoprefixer({
+            browsers: ['last 2 versions']
+        }))
+        .pipe(sourcemaps.write('css/'))
+        .pipe(gulp.dest(paths.build.css))
+        .pipe(sync.stream());
 });
+
 
 // scripts
 gulp.task('scripts', function() {
 	return gulp.src(paths.src.scripts)
+        .pipe(plumber())
 		.pipe(rigger())
 		.pipe(changed(paths.build.js))
 		.pipe(uglify())
@@ -97,6 +103,14 @@ gulp.task('sprites', function () {
   return merge(imgStream, cssStream);
 });
 
+// Bower Files
+gulp.task('bowerFiles', function() {
+	return gulp.src('bower.json')
+		.pipe(mainBowerFiles())
+		.pipe(changed(paths.build.libs))
+		.pipe(gulp.dest(paths.build.libs));
+});
+
 
 // fonts
 gulp.task('fonts', function () {
@@ -111,7 +125,7 @@ gulp.task('serve', ['html', 'sass', 'scripts', 'fonts', 'imgmin', 'sprites'], fu
 			baseDir: paths.build.html
 		}
 	});
-
+	// TODO add main-bower-files to watch
 	gulp.watch(paths.src.pug, ['html']);
 	gulp.watch(paths.src.sass, ['sass']);
 	gulp.watch(paths.src.scripts, ['scripts']);
