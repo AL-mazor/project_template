@@ -1,0 +1,18 @@
+// Colors
+$lb: #1a1e1e
+$blue: #34495e
+$wh: #fff
+$bl: #000
+
+// Media
+$lg-desk: '(max-width: 1630px)'
+$sm-desk: '(max-width: 1199px)'
+$tab: '(max-width: 991px)'
+$lg-mob: '(max-width: 767px)'
+$lg-mob-port: $lg-mob + ' and (orientation: portrait)'
+$lg-mob-land: $lg-mob + ' and (orientation: landscape)'
+$sm-mob: '(max-width: 369px)'
+
+@mixin respond-to($media)
+	@media only screen and #{$media}
+		@content
