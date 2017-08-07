@@ -1,7 +1,7 @@
 var gulp = require('gulp'),
-	pug = require('gulp-pug'),
+	pug = require('gulp-pug'), // html templates
 	sass = require('gulp-sass'),
-	uncss = require('gulp-uncss'),
+	uncss = require('gulp-uncss'), // unused css
 	spritesmith = require('gulp.spritesmith'),
 	autoprefixer = require('gulp-autoprefixer'),
 	watch = require('gulp-watch'),
@@ -12,9 +12,9 @@ var gulp = require('gulp'),
     rigger = require('gulp-rigger'),
 	imagemin = require('gulp-imagemin'),
 	uglify = require('gulp-uglify'),
-	changed = require('gulp-changed'),
-	rimraf = require('rimraf'),
-	buffer = require('vinyl-buffer'),
+	changed = require('gulp-changed'), // check if files in dist directory are changed
+	// rimraf = require('rimraf'),
+	// buffer = require('vinyl-buffer'),
 	csso = require('gulp-csso');
 
 // pathes to files
@@ -51,12 +51,12 @@ gulp.task('html', function buildHTML() {
 gulp.task('sass', function () {
 	return gulp.src(paths.src.sass)
 		.pipe(sourcemaps.init())
-		.pipe(changed(paths.build.css))
-		.pipe(sass())
-		.pipe(csso())
-		.pipe(autoprefixer({
-			browsers: ['last 2 versions']
-		}))
+			.pipe(changed(paths.build.css))
+			.pipe(sass())
+			.pipe(csso())
+			.pipe(autoprefixer({
+				browsers: ['last 2 versions']
+			}))
 		.pipe(sourcemaps.write('css/'))
 		.pipe(gulp.dest(paths.build.css))
 		.pipe(sync.stream());
@@ -79,7 +79,7 @@ gulp.task('imgmin', function () {
 		.pipe(changed(paths.build.img))
 		.pipe(imagemin())
 		.pipe(gulp.dest(paths.build.img))
-})
+});
 
 // sprites
 gulp.task('sprites', function () {
@@ -88,7 +88,7 @@ gulp.task('sprites', function () {
     cssName: 'sprite.css'
   }));
   var imgStream = spriteData.img 
-    .pipe(buffer())
+    // .pipe(buffer())
     .pipe(imagemin())
     .pipe(gulp.dest(paths.build.sprites));
   var cssStream = spriteData.css
